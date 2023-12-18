@@ -3,58 +3,48 @@
 
 #include <Stream.h>
 
-#define MAX_PAYLOAD_SIZE 232
-#define MAX_BUFFER_SIZE 237
+#define MAX_PAYLOAD_SIZE     232
+#define MAX_BUFFER_SIZE      237
 
-#define BW125                     0x00
-#define BW250                     0x01
-#define BW500                     0x02
+#define BW125                0x00
+#define BW250                0x01
+#define BW500                0x02
 
-#define SF_LoRa_7                 0x07
-#define SF_LoRa_8                 0x08
-#define SF_LoRa_9                 0x09
-#define SF_LoRa_10                0x0A
-#define SF_LoRa_11                0x0B
-#define SF_LoRa_12                0x0C
-#define SF_FSK                    0x00
+#define SF7                  0x07
+#define SF8                  0x08
+#define SF9                  0x09
+#define SF10                 0x0A
+#define SF11                 0x0B
+#define SF12                 0x0C
+#define SF_FSK               0x00
 
-#define CR4_5                     0x01
-#define CR4_6                     0x02
-#define CR4_7                     0x03
-#define CR4_8                     0x04
+#define CR4_5                0x01
+#define CR4_6                0x02
+#define CR4_7                0x03
+#define CR4_8                0x04
 
-#define LoRa_CLASS_A              0x00
-#define LoRa_CLASS_C              0x02
+#define CLASS_A              0x00
+#define CLASS_C              0x02
 
-#define LoRa_WINDOW_5s            0x00
-#define LoRa_WINDOW_10s           0x01
-#define LoRa_WINDOW_15s           0x02
+#define WINDOW_5s            0x00
+#define WINDOW_10s           0x01
+#define WINDOW_15s           0x02
 
-#define LoRa_GPIO_MODE_READ       0x00
-#define LoRa_GPIO_MODE_CONFIG     0x02
-#define LoRa_GPIO_MODE_WRITE      0x01
+#define GPIO_MODE_READ       0x00
+#define GPIO_MODE_WRITE      0x01
+#define GPIO_MODE_CONFIG     0x02
 
-#define LoRa_GPIO0                0x00
-#define LoRa_GPIO1                0x01 
-#define LoRa_GPIO2                0x02 
-#define LoRa_GPIO3                0x03
-#define LoRa_GPIO4                0x04
-#define LoRa_GPIO5                0x05
-#define LoRa_GPIO6                0x06
-#define LoRa_GPIO7                0x07 
+#define LoRa_NOT_PULL        0x00
+#define LoRa_PULLUP          0x01
+#define LoRa_PULLDOWN        0x02
 
-#define LoRa_NOT_PULL             0x00
-#define LoRa_PULLUP               0x01
-#define LoRa_PULLDOWN             0x02
-
-#define LoRa_INOUT_DIGITAL_INPUT  0x00
-#define LoRa_INOUT_DIGITAL_OUTPUT 0x01
-#define LoRa_INOUT_ANALOG_INPUT   0x03
-
-#define LoRa_LOGICAL_LEVEL_LOW    0x00
-#define LoRa_LOGICAL_LEVEL_HIGH   0x01
+#define INOUT_DIGITAL_INPUT  0x00
+#define INOUT_DIGITAL_OUTPUT 0x01
+#define INOUT_ANALOG_INPUT   0x03
 
 class LoRaMESH{
+    private:
+        bool analogEnabled = false;
     public:
         bool debug_serial = false;
         typedef struct
@@ -101,19 +91,19 @@ class LoRaMESH{
                 
                 for(j=0; j<8; j++)
                 {
-                bitbang = crc_calc;
-                crc_calc >>= 1;
-                
-                if(bitbang & 1)
-                {
-                    crc_calc ^= 0xA001;
-                }
+                    bitbang = crc_calc;
+                    crc_calc >>= 1;
+                    
+                    if(bitbang & 1)
+                    {
+                        crc_calc ^= 0xA001;
+                    }
                 }
             }
             return (crc_calc&0xFFFF);
         }
 
-        bool PrepareFrameCommand(uint16_t id, uint8_t command, uint8_t* payload, uint8_t payloadSize){
+        bool prepareFrameCommand(uint16_t id, uint8_t command, uint8_t* payload, uint8_t payloadSize){
             if((id < 0)) return false;
             if(command < 0) return false;
             if(payload < 0) return false;
@@ -145,7 +135,7 @@ class LoRaMESH{
 
             frame.command = true;
 
-            return true;
+            return sendPacket();
         }
 
         bool PrepareFrameTransp(uint16_t id, uint8_t* payload, uint8_t payloadSize)
@@ -188,7 +178,7 @@ class LoRaMESH{
             return true;
         }
 
-        bool SendPacket(){
+        bool sendPacket(){
             if(frame.size == 0) return false;
             if(debug_serial)
             {
@@ -208,7 +198,7 @@ class LoRaMESH{
             return true;
         }
 
-        bool ReceivePacketCommand(uint16_t* id, uint8_t* command, uint8_t* payload, uint8_t* payloadSize, uint32_t timeout){
+        bool receivePacketCommand(uint16_t* id, uint8_t* command, uint8_t* payload, uint8_t* payloadSize, uint32_t timeout){
             uint16_t waitNextByte = 500;
             uint8_t i = 0;
             uint16_t crc = 0;
@@ -234,7 +224,7 @@ class LoRaMESH{
                 delay(1);
             }
             
-            if(i > 0){
+            if(debug_serial && i > 0){
                 Serial.print("RX: ");
                 printHex(frame.buffer, i);
             }
@@ -250,7 +240,7 @@ class LoRaMESH{
             return true;
         }
 
-        bool ReceivePacketTransp(uint16_t* id, uint8_t* payload, uint8_t* payloadSize, uint32_t timeout)
+        bool receivePacketTransp(uint16_t* id, uint8_t* payload, uint8_t* payloadSize, uint32_t timeout)
         {
             uint16_t waitNextByte = 500;
             uint8_t i = 0;
@@ -299,22 +289,21 @@ class LoRaMESH{
                 memcpy(payload, &frame.buffer[0], i);
             }
             
-            return true;
+            return sendPacket();
         }
 
 
 
-        bool localread(){
+        bool localRead(){
             uint8_t b = 0;
             
             bufferPayload[b] = 0x00;
             bufferPayload[++b] = 0x00;
             bufferPayload[++b] = 0x00;
 
-            PrepareFrameCommand(0, 0xE2, bufferPayload, b + 1);
-            SendPacket();
+            prepareFrameCommand(0, 0xE2, bufferPayload, b + 1);
             
-            if(ReceivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000)){
+            if(receivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000)){
                 if(command == 0xE2)
                 {
                     registered_password = bufferPayload[1] << 8;
@@ -333,11 +322,11 @@ class LoRaMESH{
 
         void begin(bool _debug_serial = false){
             debug_serial = _debug_serial;
-            localread();
+            localRead();
             localId = (uint16_t)frame.buffer[0] | ((uint16_t)frame.buffer[1] << 8);
         }
 
-        bool setnetworkId(uint16_t id){
+        bool setNetworkID(uint16_t id){
             uint8_t b = 0;
             
             bufferPayload[b] = 0x00;
@@ -353,10 +342,9 @@ class LoRaMESH{
             bufferPayload[++b] = 0x00;
             bufferPayload[++b] = 0x04;
 
-            PrepareFrameCommand(id, 0xCA, bufferPayload, b + 1);
-            SendPacket();
+            prepareFrameCommand(id, 0xCA, bufferPayload, b + 1);
             
-            if(ReceivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000))
+            if(receivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000))
             {
                 if(command == 0xCA)
                 return true;
@@ -364,7 +352,7 @@ class LoRaMESH{
             return false;
         }
 
-        bool setpassword(uint32_t password){
+        bool setPassword(uint32_t password){
             if(password < 0x00 || password < 0x00 || password > 0xFFFFFFFF)
                 return false;
             uint8_t b = 0;
@@ -377,17 +365,16 @@ class LoRaMESH{
             bufferPayload[++b] = ((password / 256) >> 8) & 0xFF;
             bufferPayload[++b] = ((password / 256) >> 16) & 0xFF;
             
-            PrepareFrameCommand(localId, 0xCD, bufferPayload, b + 1);
-            SendPacket();
+            prepareFrameCommand(localId, 0xCD, bufferPayload, b + 1);
 
             buffer_password = bufferPayload[2] << 8;
             buffer_password += bufferPayload[1];
                 
-            if(ReceivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000))
+            if(receivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000))
             {
                 if(command == 0xCD)
                 {
-                    localread();
+                    localRead();
                     
                     if(buffer_password == registered_password)
                         return true;
@@ -397,7 +384,7 @@ class LoRaMESH{
             return false;  
         }
 
-        bool read_config_bps(bool ignore_cmd = false){
+        bool getBPS(bool ignore_cmd = false){
             uint8_t b = 0;
 
             if(!ignore_cmd){
@@ -405,11 +392,10 @@ class LoRaMESH{
                 bufferPayload[++b] = 0x01;
                 bufferPayload[++b] = 0x00;
 
-                PrepareFrameCommand(localId, 0xD6, bufferPayload, b + 1);
-                SendPacket();
+                prepareFrameCommand(localId, 0xD6, bufferPayload, b + 1);
             }
 
-            if(ReceivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000)){
+            if(receivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000)){
                 if(command == 0xD6){
                     BW = bufferPayload[2];
                     SF = bufferPayload[3];
@@ -420,7 +406,7 @@ class LoRaMESH{
             return false;
         }
 
-        bool read_config_class(bool ignore_cmd = false){
+        bool getClass(bool ignore_cmd = false){
             uint8_t b = 0;
             if(!ignore_cmd){
                 bufferPayload[b] = 0x00;
@@ -428,11 +414,10 @@ class LoRaMESH{
                 bufferPayload[++b] = 0x00;
                 bufferPayload[++b] = 0x00;
 
-                PrepareFrameCommand(localId, 0xC1, bufferPayload, b + 1);
-                SendPacket();
+                prepareFrameCommand(localId, 0xC1, bufferPayload, b + 1);
             }
             
-            if(ReceivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000)){
+            if(receivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000)){
                 if(command == 0xC1){
                     LoRa_class = bufferPayload[2];
                     LoRa_window = bufferPayload[3];
@@ -443,7 +428,7 @@ class LoRaMESH{
             return false;
         }
 
-        bool config_bps(uint8_t bandwidth = BW500, uint8_t spreading_factor = SF_LoRa_7, uint8_t coding_rate = CR4_5){
+        bool setBPS(uint8_t bandwidth = BW500, uint8_t spreading_factor = SF7, uint8_t coding_rate = CR4_5){
             if(bandwidth < 0x00 || bandwidth > 0x02)
                 return false;
             else if(spreading_factor < 0x00 || spreading_factor > 0x00 && spreading_factor < 0x07 || spreading_factor > 0x0C)
@@ -459,10 +444,9 @@ class LoRaMESH{
             bufferPayload[++b] = spreading_factor;
             bufferPayload[++b] = coding_rate;
             
-            PrepareFrameCommand(localId, 0xD6, bufferPayload, b + 1);
-            SendPacket();
+            prepareFrameCommand(localId, 0xD6, bufferPayload, b + 1);
 
-            read_config_bps(true);
+            getBPS(true);
 
             if(BW == bandwidth && SF == spreading_factor && CR == coding_rate)
                 return true;
@@ -470,7 +454,7 @@ class LoRaMESH{
             return false;
         }
 
-        bool config_class(uint8_t lora_class = LoRa_CLASS_C, uint8_t lora_window = LoRa_WINDOW_5s){
+        bool setClass(uint8_t lora_class = CLASS_C, uint8_t lora_window = WINDOW_5s){
             if(lora_class < 0x00 || lora_class != 0x00 && lora_class != 0x02)
                 return false;
             else if(lora_window < 0x00 || lora_window > 0x02)
@@ -483,9 +467,8 @@ class LoRaMESH{
             bufferPayload[++b] = lora_window;
             bufferPayload[++b] = 0x00;
 
-            PrepareFrameCommand(localId, 0xC1, bufferPayload, b + 1);
-            SendPacket();
-            read_config_class(true);
+            prepareFrameCommand(localId, 0xC1, bufferPayload, b + 1);
+            getClass(true);
 
             if(LoRa_class == lora_class && LoRa_window == lora_window)
                 return true;
@@ -493,28 +476,50 @@ class LoRaMESH{
             return false;
         }    
 
-        bool config_digital_gpio(uint8_t gpio, uint8_t pull, uint8_t inout, uint8_t logical_level){
+        bool pinMode(uint8_t id, uint8_t gpio, uint8_t inout, uint8_t logical_level = LOW){
             if(gpio < 0x00 || gpio > 0x07)
                 return false;
-            else if(pull < 0x00 || pull > 0x02)
-                return false;
+            /*else if(pull < 0x00 || pull > 0x02)
+                return false;*/
             else if(inout < 0x00 || inout == 0x02 || inout == 0x03 && gpio < 0x05 && inout == 0x03 && gpio > 0x06 || inout > 0x03)
                 return false;
             else if(logical_level < 0x00 || logical_level > 0x03)
                 return false;
-            
+            uint8_t pull;
+
+            if(inout == INPUT){
+              pull = LoRa_NOT_PULL;
+
+            }
+            switch(inout){
+                case INPUT:
+                    if(gpio > 4 && gpio < 7)
+                        inout = INOUT_DIGITAL_INPUT;
+                    pull = LoRa_NOT_PULL; break;
+                case INPUT_PULLUP:   inout = INOUT_DIGITAL_INPUT; pull = LoRa_PULLUP; break;
+                case INPUT_PULLDOWN: inout = INOUT_DIGITAL_INPUT; pull = LoRa_PULLDOWN; break;
+            }
+
             uint8_t b = 0;
+            if(gpio > 4 && gpio < 7 && inout == LoRa_INOUT_DIGITAL_INPUT){
+                bufferPayload[b] = 0x02;
+                bufferPayload[++b] = 0x00;
+                bufferPayload[++b] = gpio;
+                bufferPayload[++b] = 0x00;
+                bufferPayload[++b] = INOUT_ANALOG_INPUT;
+                analogEnabled = true;
+            }
+            else{
+                bufferPayload[b] = 0x02;
+                bufferPayload[++b] = gpio;
+                bufferPayload[++b] = pull;
+                bufferPayload[++b] = inout;
+                bufferPayload[++b] = logical_level;
+            }
 
-            bufferPayload[b] = 0x02;
-            bufferPayload[++b] = gpio;
-            bufferPayload[++b] = pull;
-            bufferPayload[++b] = inout;
-            bufferPayload[++b] = logical_level;
-
-            PrepareFrameCommand(localId, 0xC2, bufferPayload, b + 1);
-            SendPacket();
+            prepareFrameCommand(id, 0xC2, bufferPayload, b + 1);
             
-            if(ReceivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000))
+            if(receivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000))
             {
                 if(command == 0xC2){
                 return true;
@@ -524,24 +529,7 @@ class LoRaMESH{
             return false;
         }
 
-        bool config_analog_gpio(uint8_t gpio){
-            if(gpio < 0x05 || gpio > 0x06)
-                return false;
-            
-            uint8_t b = 0;
-            bufferPayload[b] = 0x02;
-            bufferPayload[++b] = gpio;
-            bufferPayload[++b] = 0x00;
-            bufferPayload[++b] = LoRa_INOUT_ANALOG_INPUT;
-            bufferPayload[++b] = 0x00;
-
-            PrepareFrameCommand(localId, 0xC2, bufferPayload, b + 1);
-            SendPacket();
-
-            return true;
-        }
-
-        void get_gpio_status(int16_t id, uint8_t gpio){
+        void getGPIOStatus(int16_t id, uint8_t gpio){
             uint8_t b = 0;
 
             bufferPayload[b] = 0x00;
@@ -549,43 +537,101 @@ class LoRaMESH{
             bufferPayload[++b] = 0x00;
             bufferPayload[++b] = 0x00;
 
-            PrepareFrameCommand(id, 0xC2, bufferPayload, b + 1);
-            SendPacket();
+            prepareFrameCommand(id, 0xC2, bufferPayload, b + 1);
         }
 
-        double read_gpio(int16_t id, uint8_t gpio, bool analog = false){
-            get_gpio_status(id, gpio);
-            if(ReceivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000))
-            {
-                if(command == 0xC2){
-                    if(analog){
-                        uint8_t voltage = (uint16_t)bufferPayload[4] | ((uint16_t)(bufferPayload[3]&0x0F) << 8);
-                        return float(voltage)*8.0586e-4;
+        uint16_t analogRead(int16_t id, uint8_t gpio){
+            for(uint8_t i = 0; i < 3; ++i){
+                getGPIOStatus(id, gpio);
+                //0100C2 00 00 05 0A 79 1F0D
+                if(receivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000))
+                {
+                    if(command == 0xC2){
+                        uint16_t rawAnalog = bufferPayload[3]  << 8;
+                        rawAnalog |= bufferPayload[4];
+                        return rawAnalog;
                     }
-                    else
-                        return bufferPayload[4];
                 }
+            }
+            return 0;
+        }
+
+        uint8_t digitalRead(int16_t id, uint8_t gpio){
+            getGPIOStatus(id, gpio);
+            if(analogEnabled && gpio > 4 && gpio < 7){
+                if(analogRead(id, gpio) >= 4096 / 2)
+                    return 1;
+                return 0;
+            }
+            else{
+                if(receivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000))
+                    if(command == 0xC2)
+                        return bufferPayload[4];
             }
             return 0;
         } 
 
-        bool write_gpio(int16_t id, uint8_t gpio, uint8_t logical_level){
+        bool digitalWrite(int16_t id, uint8_t gpio, uint8_t logical_level){
             if(gpio < 0x00 || gpio > 0x07)
                 return false;
             else if(logical_level < 0x00 || logical_level > 0x03)
                 return false;
+            else if(analogEnabled && gpio > 4 && gpio < 7)
+                return false;
 
+            for(uint8_t i = 0; i < 3; ++i){
+                uint8_t b = 0;
+
+                bufferPayload[b] = 0x01;
+                bufferPayload[++b] = gpio;
+                bufferPayload[++b] = logical_level;
+                bufferPayload[++b] = 0x00;
+
+                prepareFrameCommand(id, 0xC2, bufferPayload, b + 1);
+
+                if(receivePacketCommand(&localId, &command, bufferPayload, &payloadSize, 1000)){
+                    if(command == 0xC2 && bufferPayload[2] == gpio && bufferPayload[3] == logical_level)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        int getNoise(uint8_t id, uint8_t select = 1){
             uint8_t b = 0;
+            bufferPayload[b] = 0;
+            bufferPayload[++b] = 0;
+            bufferPayload[++b] = 0;
 
-            bufferPayload[b] = 0x01;
-            bufferPayload[++b] = gpio;
-            bufferPayload[++b] = logical_level;
-            bufferPayload[++b] = 0x00;
+            if(select > 2)
+                select = 2;
 
-            PrepareFrameCommand(id, 0xC2, bufferPayload, b + 1);
-            SendPacket();
+            prepareFrameCommand(id, 0xD8, bufferPayload, b + 1);
+            delay(100);
+            uint8_t cmd = 0;
             
-            return true;
+            if(receivePacketCommand(&localId, &cmd, bufferPayload, &payloadSize, 270)){
+                if(cmd == 0xD8)
+                    return bufferPayload[select];
+                else
+                    return 255;
+            }
+            else
+                delay(100);
+                
+            return 255;
+        }
+
+        int getR1(uint16_t rawADC, int R2){
+            return  R2 * (4096 - rawADC) / rawADC;
+        }
+
+        double getTemp(uint16_t rawADC, int beta, int Rt = 10000, int R2 = 10000){
+            double R1 = getR1(rawADC, R2);
+            double rx = Rt * exp(-beta/(273.0 + 25.0));
+            double t = beta / log(R1/rx);
+            return t - 273;
         }
         
         void printHex(uint8_t* num, uint8_t tam){
