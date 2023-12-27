@@ -492,10 +492,7 @@ class LoRaMESH{
 
             }
             switch(inout){
-                case INPUT:
-                    if(gpio > 4 && gpio < 7)
-                        inout = INOUT_DIGITAL_INPUT;
-                    pull = LoRa_NOT_PULL; break;
+                case INPUT:          inout = INOUT_DIGITAL_INPUT; pull = LoRa_NOT_PULL; break;
                 case INPUT_PULLUP:   inout = INOUT_DIGITAL_INPUT; pull = LoRa_PULLUP; break;
                 case INPUT_PULLDOWN: inout = INOUT_DIGITAL_INPUT; pull = LoRa_PULLDOWN; break;
             }
