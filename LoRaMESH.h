@@ -501,7 +501,7 @@ class LoRaMESH{
             }
 
             uint8_t b = 0;
-            if(gpio > 4 && gpio < 7 && inout == LoRa_INOUT_DIGITAL_INPUT){
+            if(gpio > 4 && gpio < 7 && inout == INOUT_DIGITAL_INPUT){
                 bufferPayload[b] = 0x02;
                 bufferPayload[++b] = 0x00;
                 bufferPayload[++b] = gpio;
