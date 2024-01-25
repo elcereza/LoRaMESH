@@ -2,6 +2,7 @@
 #define LoRaMESH_h
 
 #include <Stream.h>
+#include <Arduino.h>
 
 #define MAX_PAYLOAD_SIZE     232
 #define MAX_BUFFER_SIZE      237
@@ -41,6 +42,22 @@
 #define INOUT_DIGITAL_INPUT  0x00
 #define INOUT_DIGITAL_OUTPUT 0x01
 #define INOUT_ANALOG_INPUT   0x03
+
+
+#ifndef INPUT
+#define INPUT                0
+#endif
+#ifndef INPUT_PULLUP
+#define INPUT_PULLUP         7
+#endif
+
+#ifdef  INPUT_PULLDOWN_16
+#define INPUT_PULLDOWN       INPUT_PULLDOWN_16
+#endif
+
+#ifndef INPUT_PULLDOWN
+#define INPUT_PULLDOWN       8
+#endif
 
 class LoRaMESH{
     private:
