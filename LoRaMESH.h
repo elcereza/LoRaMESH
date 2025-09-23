@@ -121,12 +121,6 @@ class LoRaMESH{
         }
 
         bool prepareFrameCommand(uint16_t id, uint8_t command, uint8_t* payload, uint8_t payloadSize){
-            if((id < 0)) return false;
-            if(command < 0) return false;
-            if(payload < 0) return false;
-            if(payloadSize < 0) return false;
-            
-
             uint16_t crc = 0;
 
             frame.size = payloadSize + 5;
@@ -157,12 +151,7 @@ class LoRaMESH{
 
         bool PrepareFrameTransp(uint16_t id, uint8_t* payload, uint8_t payloadSize)
         {
-            uint8_t i = 0;
-
-            if(payload == NULL) return false;
-            if(id > 1023) return false;
-            if(deviceId == -1) return false;
-            
+            uint8_t i = 0;            
             frame.size = payloadSize + 2;
             frame.buffer[i++] = id&0xFF;
             frame.buffer[i++] = (id>>8)&0x03;
@@ -219,12 +208,7 @@ class LoRaMESH{
             uint16_t waitNextByte = 500;
             uint8_t i = 0;
             uint16_t crc = 0;
-
-            if(id < 0x00) return false;
-            if(command < 0x00) return false;
-            if(payload < 0x00) return false;
-            if(payloadSize < 0x00) return false;
-
+            
             while( ((timeout > 0 ) || (i > 0)) && (waitNextByte > 0) )
             {
                 if(SerialLoRa->available() > 0)
@@ -663,3 +647,4 @@ class LoRaMESH{
         }
 };
 #endif
+
