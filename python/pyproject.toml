@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61", "wheel", "pybind11"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loramesh"
+version = "1.0.0"
+description = "C++ library to communicate with Radioenge LoRaMESH modules via UART, with Python bindings"
+readme = "README.md"
+authors = [
+  { name = "Gustavo Cereza", email = "contato@elcereza.com" }
+]
+license = "MIT"
+
+keywords = [
+  "lora",
+  "mesh",
+  "loramesh",
+  "radioenge",
+  "uart",
+  "iot",
+  "embedded"
+]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: C++",
+  "Operating System :: OS Independent"
+]
+
+[project.urls]
+Homepage = "https://elcereza.com"
+Repository = "https://github.com/elcereza/LoRaMESH"

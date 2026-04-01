@@ -1,0 +1,8 @@
+examples/ESPIDF/
+examples/STM32/
+
+python/dist/
+python/src/loramesh.egg-info/
+
+src/adapters/stm32_hal/
+src/adapters/espidf/

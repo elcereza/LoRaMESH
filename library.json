@@ -1,0 +1,33 @@
+{
+  "name": "LoRaMESH",
+  "version": "1.0.0",
+  "description": "C++ library to communicate with Radioenge LoRaMESH modules via UART, supporting command and transparent modes with portable transport layers.",
+  "keywords": [
+    "lora",
+    "mesh",
+    "loramesh",
+    "radioenge",
+    "uart",
+    "iot",
+    "embedded"
+  ],
+  "authors": [
+    {
+      "name": "Gustavo Cereza",
+      "url": "https://github.com/GustavoCereza"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elcereza/LoRaMESH"
+  },
+  "frameworks": [
+    "arduino",
+    "espidf",
+    "stm32cube"
+  ],
+  "platforms": "*",
+  "build": {
+    "includeDir": "src"
+  }
+}
