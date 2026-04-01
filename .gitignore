@@ -3,6 +3,8 @@ examples/STM32/
 
 python/dist/
 python/src/loramesh.egg-info/
+python/venv/
+python/build/
 
 src/adapters/stm32_hal/
 src/adapters/espidf/

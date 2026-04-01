@@ -1,16 +1,35 @@
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 #include "core/LoRaMESH.h"
+
+#ifdef __linux__
 #include "adapters/linux/LinuxSerialTransport.h"
+#endif
+
+#ifdef _WIN32
+#include "adapters/windows/WindowsSerialTransport.h"
+#endif
 
 namespace py = pybind11;
 
 class PyLoRaMESH
 {
 private:
+#ifdef __linux__
     LinuxSerialTransport transport;
-    LoRaMESH mesh;
+#elif defined(_WIN32)
+    WindowsSerialTransport transport;
+#endif
+    LoRaMESH mesh; 
+    
     static void debugCallback(const char* msg)
     {
         py::print(msg);
@@ -19,7 +38,11 @@ private:
 public:
 
     PyLoRaMESH(const std::string& device, int baud)
+    #ifdef __linux__
         : transport(device.c_str(), baud),
+    #elif defined(_WIN32)
+        : transport(device.c_str(), baud),
+    #endif
         mesh(&transport, &transport)
     {
     }
