@@ -126,7 +126,7 @@ pip install pybind11 setuptools build twine
 * Python 3
 * acesso à porta serial do sistema
 * módulo LoRaMESH conectado corretamente
-* permissões adequadas para acessar `/dev/ttyACM*` ou `/dev/ttyUSB*`
+* permissões adequadas para acessar `/dev/ttyACM*` ou `/dev/ttyUSB*`. Se estiver usando Windows use `r"\\.\COM*"` quando a `COM` for maior que 10, caso contrário você poderá usar apenas `COM*`, de qualqeur forma eu recomendo já usar assim `r"\\.\COM*"`
 * ambiente compatível com a extensão C++ gerada no build
 
 Em Linux, muitas vezes é necessário garantir que o usuário tenha permissão para acessar a serial, normalmente via grupo como `dialout`.
