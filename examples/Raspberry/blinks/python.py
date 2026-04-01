@@ -2,8 +2,8 @@ import loramesh
 import time
 import random
 
-PORT = r"\\.\COM29"
-BAUD = 115200
+PORT = "/dev/ttyACM0"
+BAUD = 9600
 
 ID = 0
 
