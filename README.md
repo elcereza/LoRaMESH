@@ -9,7 +9,7 @@ Este projeto não foi pensado apenas para um único firmware ou para um único s
 
 Por isso, a biblioteca foi estruturada em torno de um núcleo C++ com uma abstração de transporte chamada `ILoraTransport`, permitindo reaproveitar a mesma lógica de protocolo em diferentes plataformas sem reescrever o comportamento principal do módulo a cada novo port.
 
-Além disso, este core também é a base da SDK Python do projeto. A camada Python, instalada com:
+Além disso, este core também é a base da [SDK Python](https://github.com/elcereza/LoRaMESH/tree/master/python) do projeto. A camada Python, instalada com:
 
 ```bash
 pip install loramesh
