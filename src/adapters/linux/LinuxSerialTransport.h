@@ -8,7 +8,6 @@ class LinuxSerialTransport : public ILoraTransport
 {
 private:
     int fd;
-
 public:
     LinuxSerialTransport(const char* device, int baud);
 

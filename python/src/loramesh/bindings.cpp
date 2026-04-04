@@ -24,10 +24,13 @@ class PyLoRaMESH
 {
 private:
 #ifdef __linux__
-    LinuxSerialTransport transport;
+    LinuxSerialTransport transportCmd;
+    LinuxSerialTransport transportTransparent;
 #elif defined(_WIN32)
-    WindowsSerialTransport transport;
+    WindowsSerialTransport transportCmd;
+    WindowsSerialTransport transportTransparent;
 #endif
+
     LoRaMESH mesh; 
     
     static void debugCallback(const char* msg)
@@ -36,14 +39,32 @@ private:
     }
 
 public:
-
     PyLoRaMESH(const std::string& device, int baud)
-    #ifdef __linux__
-        : transport(device.c_str(), baud),
-    #elif defined(_WIN32)
-        : transport(device.c_str(), baud),
-    #endif
-        mesh(&transport, &transport)
+#ifdef __linux__
+        : transportCmd(device.c_str(), baud),
+          transportTransparent(device.c_str(), baud),
+#elif defined(_WIN32)
+        : transportCmd(device.c_str(), baud),
+          transportTransparent(device.c_str(), baud),
+#endif
+          mesh(&transportCmd, &transportTransparent)
+    {
+    }
+
+    PyLoRaMESH(
+        const std::string& cmd_device,
+        int cmd_baud,
+        const std::string& transp_device,
+        int transp_baud
+    )
+#ifdef __linux__
+        : transportCmd(cmd_device.c_str(), cmd_baud),
+          transportTransparent(transp_device.c_str(), transp_baud),
+#elif defined(_WIN32)
+        : transportCmd(cmd_device.c_str(), cmd_baud),
+          transportTransparent(transp_device.c_str(), transp_baud),
+#endif
+          mesh(&transportCmd, &transportTransparent)
     {
     }
 
@@ -167,6 +188,7 @@ PYBIND11_MODULE(loramesh, m)
 {
     py::class_<PyLoRaMESH>(m, "LoRaMESH")
         .def(py::init<const std::string&, int>())
+        .def(py::init<const std::string&, int, const std::string&, int>())
         .def("begin", &PyLoRaMESH::begin,
             py::arg("debug")=true,
             py::arg("hex_dump")=true)

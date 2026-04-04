@@ -8,3 +8,15 @@ python/build/
 
 src/adapters/stm32_hal/
 src/adapters/espidf/
+
+micropython/workspace/
+micropython/examples/rp2
+micropython/examples/sipeed
+micropython/loramesh/__pycache__
+micropython/loramesh/adapters/__pycache__
+micropython/loramesh/backend/__pycache__
+micropython/loramesh/boards/__pycache__
+micropython/loramesh/core/__pycache__
+micropython/loramesh/transport/__pycache__
+
+package.json
