@@ -1,0 +1,58 @@
+!SESSION 2026-04-05 19:06:35.085 -----------------------------------------------
+eclipse.buildId=Version 1.19.0
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -os linux -ws gtk -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-04-05 19:11:57.712
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-04-05 19:11:57.748
+!MESSAGE Log4j2 initialized with config file /media/gustavo/nas/ssd/Lab/GitHub/LoRaMESH/examples/stm32/blinks/.metadata/.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-04-05 19:11:59.929
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 4 1002 2026-04-05 19:13:10.861
+!MESSAGE HTTP Server 'Bad Gateway' : https://download.eclipse.org/tools/cdt/releases/latest/compositeContent.xml
+!STACK 1
+org.eclipse.ecf.filetransfer.BrowseFileTransferException: HttpComponents connection error response code 502.
+	at org.eclipse.ecf.provider.filetransfer.httpclientjava.HttpClientFileSystemBrowser.runRequest(HttpClientFileSystemBrowser.java:295)
+	at org.eclipse.ecf.provider.filetransfer.browse.AbstractFileSystemBrowser$DirectoryJob.run(AbstractFileSystemBrowser.java:71)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+!SUBENTRY 1 org.eclipse.ecf.identity 4 0 2026-04-05 19:13:10.861
+!MESSAGE HttpComponents connection error response code 502.
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-04-05 19:24:45.776
+!MESSAGE Indexed 'stm32l412kb_loramesh' (23 sources, 83 headers) in 2.04 sec: 5,470 declarations; 28,052 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.006%)
+
+!ENTRY com.st.stm32cube.ide.mcu.debug.launch 2 0 2026-04-05 20:08:23.498
+!MESSAGE Won't launch debug session since we failed to locate the binary.
+
+!ENTRY com.st.stm32cube.ide.mcu.build 1 1 2026-04-05 20:25:23.726
+!MESSAGE Converted project stm32l412kb_loramesh to C++ in 3304 (ms)
+
+!ENTRY com.st.stm32cube.ide.mcu.debug.launch 2 0 2026-04-05 20:36:50.981
+!MESSAGE Won't launch debug session since we failed to locate the binary.
+
+!ENTRY org.eclipse.cdt.core 1 0 2026-04-05 20:52:11.154
+!MESSAGE Indexed 'stm32l412kb_loramesh' (25 sources, 164 headers) in 2.46 sec: 11,914 declarations; 39,816 references; 0 unresolved inclusions; 1 syntax errors; 4 unresolved names (0.0077%)
+!SESSION 2026-04-05 22:18:29.892 -----------------------------------------------
+eclipse.buildId=Version 1.19.0
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -os linux -ws gtk -arch x86_64
+
+!ENTRY org.eclipse.core.resources 2 10035 2026-04-05 22:18:35.553
+!MESSAGE The workspace exited with unsaved changes in the previous session; refreshing workspace to recover changes.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2026-04-05 22:18:38.270
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2026-04-05 22:18:38.286
+!MESSAGE Log4j2 initialized with config file /media/gustavo/nas/ssd/Lab/GitHub/LoRaMESH/examples/stm32/blinks/.metadata/.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2026-04-05 22:18:43.742
+!MESSAGE Started RMI Server, listening on port 41337

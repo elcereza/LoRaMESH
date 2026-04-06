@@ -1,0 +1,52 @@
+#pragma once
+#if defined(STM32)
+
+#include "transport/ILoraTransport.h"
+
+#include "stm32l4xx_hal.h"  // ajuste para o seu MCU (ex: stm32l4xx_hal.h)
+
+typedef size_t (*RbAvailableFn)(void* ctx);
+typedef size_t (*RbReadFn)(void* ctx, uint8_t* out, size_t maxLen);
+
+class Stm32HalUartTransport : public ILoraTransport
+{
+public:
+    Stm32HalUartTransport(UART_HandleTypeDef* huart,
+                          void* rb_ctx,
+                          RbAvailableFn avail_fn,
+                          RbReadFn read_fn)
+        : uart(huart), rbCtx(rb_ctx), rbAvail(avail_fn), rbRead(read_fn) {}
+
+    size_t write(const uint8_t* data, size_t len) override
+    {
+        if (!uart) return 0;
+        if (HAL_UART_Transmit(uart, (uint8_t*)data, (uint16_t)len, 100) != HAL_OK) return 0;
+        return len;
+    }
+
+    size_t available() override
+    {
+        if (!rbAvail) return 0;
+        return rbAvail(rbCtx);
+    }
+
+    size_t read(uint8_t* buffer, size_t maxLen) override
+    {
+        if (!rbRead) return 0;
+        return rbRead(rbCtx, buffer, maxLen);
+    }
+
+    uint32_t millis() override
+    {
+        return HAL_GetTick();
+    }
+
+private:
+    UART_HandleTypeDef* uart;
+
+    void* rbCtx;
+    RbAvailableFn rbAvail;
+    RbReadFn rbRead;
+};
+
+#endif

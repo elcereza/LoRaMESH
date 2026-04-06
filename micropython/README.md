@@ -1,59 +1,58 @@
 # LoRaMESH MicroPython
 
-Biblioteca **LoRaMESH para MicroPython** voltada para comunicação com módulos **LoRaMESH (Radioenge)** em ambientes embarcados leves, principalmente quando a ideia é subir testes rápidos, integrações simples, prototipagem e experimentação diretamente em placas compatíveis com MicroPython.
+Biblioteca **LoRaMESH para MicroPython** voltada para comunicação com módulos **LoRaMESH (Radioenge)** em ambientes embarcados leves, principalmente quando a ideia é subir testes rápidos, integrações simples, prototipagem e aplicações práticas diretamente em placas compatíveis com MicroPython.
 
 Este port existe para levar a proposta do ecossistema LoRaMESH para um ambiente mais leve e mais direto de testar em hardware, mantendo a mesma linha conceitual do projeto principal:
 
 - o **core nativo em C++** continua sendo a base técnica do ecossistema
 - a **SDK Python para Linux/Raspberry Pi** funciona como camada de alto nível
-- a **variação MicroPython** tenta levar essa mesma ideia para microcontroladores compatíveis com runtime interpretado
+- a **variação MicroPython** leva essa mesma ideia para microcontroladores compatíveis com runtime interpretado
 
 Em outras palavras, esta biblioteca não nasce como um projeto isolado. Ela faz parte da mesma família do **LoRaMESH C++** e do **LoRaMESH Python**, mas com foco em ambientes mais limitados, onde praticidade de teste e deploy contam muito.
 
 ## Aviso importante sobre o estado deste port
 
-Este README precisa ser transparente sobre um ponto importante: **a variação MicroPython ainda deve ser tratada como experimental**.
+Este README precisa ser transparente sobre um ponto importante: **a variação MicroPython já saiu de `1.0.0.b1` e passa a ser tratada como versão `1.0.0`**.
 
-Eu não sou uma pessoa que trabalha com MicroPython como base principal de desenvolvimento. Minha experiência com esse ecossistema ainda é relativamente baixa, principalmente se comparada ao meu trabalho com C, C++, firmware embarcado e integração em hardware real.
+Essa mudança não acontece por suposição. Ela acontece porque este port já foi **testado e validado em três hardwares completamente diferentes**:
 
-Na prática, meu contato com MicroPython veio muito mais por dois caminhos:
+- **ESP32**
+- **Raspberry Pi Pico**
+- **[Sipeed MaixBit](https://s.click.aliexpress.com/e/_c4OlNQap)**
 
-- uso no **Sipeed MaixBit**
-- produção de conteúdo e experimentação para o site envolvendo **Raspberry Pi Pico**
+Isso significa que esta camada não deve mais ser apresentada como um experimento puramente conceitual. Ela já demonstrou funcionamento real em plataformas diferentes, com propostas bem distintas entre si.
 
-Por isso, este port pode apresentar:
+Ao mesmo tempo, eu faço questão de deixar claro outro ponto: **MicroPython não é a linguagem que uso na maioria dos meus trabalhos com microcontroladores**. Minha base principal continua muito mais ligada a C, C++, firmware embarcado e integração de hardware em nível mais nativo.
 
-- pontos ainda pouco refinados
-- API ainda em evolução
-- comportamento não tão otimizado quanto a base em C++
-- limitações específicas do runtime MicroPython
-- incompatibilidades que só aparecem em determinados firmwares ou placas
+Na prática, isso quer dizer o seguinte:
 
-Então a melhor leitura possível é esta: **o projeto é útil, promissor e funcional para vários cenários, mas ainda não deve ser tratado com a mesma maturidade do core em C++**.
+- a biblioteca já se mostrou funcional e viável em hardware real
+- o port já tem maturidade suficiente para sair de `1.0.0.b1` e ir para **`1.0.0`**
+- ainda assim, a organização interna, a ergonomia da API e algumas otimizações podem continuar evoluindo com o tempo
+
+A melhor leitura possível hoje é esta: **o port MicroPython já foi validado na prática e é útil de verdade**, mas ainda pode amadurecer bastante em refinamento interno porque MicroPython não é o meu foco principal de desenvolvimento.
 
 ## Direção do projeto
 
-Neste momento, o foco prático do port está em **ESP32 com MicroPython**, porque é um caminho mais natural para validar a proposta, testar UART com facilidade e subir exemplos de forma rápida.
+Neste momento, o port já conta com validação prática em **ESP32**, **Raspberry Pi Pico** e **Sipeed MaixBit**.
 
-Ao mesmo tempo, existe intenção de portabilidade futura para:
+Cada uma dessas placas ajuda a provar um ponto importante do projeto:
 
-- **Raspberry Pi Pico**
-- **Sipeed MaixBit**
+- o **ESP32** mostra um caminho muito natural para testes rápidos, UART simples e iteração frequente
+- o **Raspberry Pi Pico** mostra que a proposta também funciona em uma plataforma extremamente acessível e muito relevante para conteúdo técnico
+- o **MaixBit da Sipeed** mostra que o ecossistema consegue chegar também a um ambiente diferente, inclusive com fluxo baseado em microSD
 
-Essas duas plataformas são especialmente relevantes para o projeto por motivos diferentes:
+Além disso, essa validação em placas distintas fortalece a proposta geral do ecossistema: a biblioteca não está presa a um único hardware nem a uma única forma de deploy.
 
-- o **Raspberry Pi Pico** é uma plataforma muito acessível, popular e excelente para conteúdo prático
-- o **MaixBit da Sipeed** tem valor estratégico no laboratório por já ter sido usado em experimentações e por abrir espaço para aplicações mais específicas
-
-Ainda assim, essa portabilidade futura deve ser lida como **direção do projeto**, não como promessa de compatibilidade fechada e estável neste exato momento.
+Ainda assim, a direção do projeto continua aberta para expansão futura em outras placas compatíveis com MicroPython, sempre respeitando as particularidades de cada runtime, cada firmware e cada forma de acesso à UART.
 
 ## Sumário
 
 1. [Visão geral](#1-visão-geral)
 2. [Por que este port existe](#2-por-que-este-port-existe)
-3. [Estado atual e transparência sobre estabilidade](#3-estado-atual-e-transparência-sobre-estabilidade)
+3. [Estado atual e transparência sobre maturidade](#3-estado-atual-e-transparência-sobre-maturidade)
 4. [Relação com o ecossistema LoRaMESH](#4-relação-com-o-ecossistema-loramesh)
-5. [Plataformas atuais e direção futura](#5-plataformas-atuais-e-direção-futura)
+5. [Placas testadas e direção do projeto](#5-placas-testadas-e-direção-do-projeto)
 6. [Quando usar esta versão](#6-quando-usar-esta-versão)
 7. [Quando não usar esta versão](#7-quando-não-usar-esta-versão)
 8. [Arquitetura conceitual da solução](#8-arquitetura-conceitual-da-solução)
@@ -78,7 +77,7 @@ Ainda assim, essa portabilidade futura deve ser lida como **direção do projeto
 27. [Boas práticas](#27-boas-práticas)
 28. [Limitações atuais](#28-limitações-atuais)
 29. [Erros comuns e diagnóstico](#29-erros-comuns-e-diagnóstico)
-30. [Portabilidade futura para Raspberry Pi Pico e MaixBit](#30-portabilidade-futura-para-raspberry-pi-pico-e-maixbit)
+30. [Placas testadas e expansão futura](#30-placas-testadas-e-expansão-futura)
 31. [Casos de uso reais](#31-casos-de-uso-reais)
 32. [Licença](#32-licença)
 33. [Contato e referências](#33-contato-e-referências)
@@ -104,6 +103,8 @@ Ele é especialmente interessante quando a prioridade é:
 - publicar conteúdo técnico prático
 - experimentar variações do ecossistema LoRaMESH em placas acessíveis
 
+No estado atual do projeto, esse port já chega com validação em **ESP32**, **Raspberry Pi Pico** e **Sipeed MaixBit**.
+
 ## 2. Por que este port existe
 
 O port de MicroPython nasce de uma necessidade bem prática: em muitos cenários, compilar e ajustar firmware nativo não é o melhor caminho para um teste rápido, uma validação simples de rede ou uma prova de conceito.
@@ -118,26 +119,33 @@ Ter a opção de subir a biblioteca em MicroPython abre espaço para:
 
 Ao mesmo tempo, este port também tem valor estratégico dentro do projeto maior. Ele mostra que a ideia da biblioteca não está presa a uma única linguagem ou a um único fluxo de desenvolvimento.
 
-## 3. Estado atual e transparência sobre estabilidade
+## 3. Estado atual e transparência sobre maturidade
 
-Esta seção existe de forma proposital. O objetivo é ser honesto com quem vai usar a biblioteca.
+Esta seção existe de forma proposital. O objetivo é posicionar corretamente a biblioteca para quem vai usar.
 
-Hoje, esta variação deve ser tratada como:
+Hoje, esta variação deve ser entendida como:
 
-- **experimental**
-- **funcional para vários cenários de teste**
-- **ainda sujeita a ajustes**
-- **menos madura que o core em C++**
-- **menos validada do que a camada Python para Linux/Raspberry Pi**
+- **validada em hardware real**
+- **já tratada como versão `1.0.0`**
+- **funcional em placas diferentes**
+- **coerente com o ecossistema principal do projeto**
+- **ainda aberta a melhorias de organização e otimização**
 
-Os principais motivos são:
+A mudança de `1.0.0.b1` para **`1.0.0`** não foi apenas simbólica. Ela acontece porque o port já foi testado e validado em:
 
-- minha experiência com MicroPython ainda é baixa
-- meu foco principal de trabalho não é MicroPython
-- o projeto ainda está amadurecendo em relação a organização, abstrações e comportamento em múltiplos runtimes
-- diferenças entre firmwares e placas podem impactar o funcionamento de forma mais sensível do que no C++
+- **ESP32**
+- **Raspberry Pi Pico**
+- **Sipeed MaixBit**
 
-Isso não invalida o projeto. Pelo contrário: apenas posiciona corretamente o nível de maturidade para quem vai usar.
+Isso mostra que a proposta funciona em cenários reais e não apenas em um único hardware muito específico.
+
+Ao mesmo tempo, também é importante ser honesto sobre outro ponto:
+
+- eu **não uso MicroPython na maioria dos meus trabalhos com microcontroladores**
+- minha experiência principal continua muito mais concentrada em **C, C++ e firmware embarcado nativo**
+- por isso, mesmo com o port validado, ainda existe espaço natural para evolução em ergonomia, organização e refinamento interno
+
+Então a leitura correta é esta: **a biblioteca já foi validada na prática e merece a versão `1.0.0`**, mas isso não impede que continue amadurecendo bastante com o tempo.
 
 ## 4. Relação com o ecossistema LoRaMESH
 
@@ -159,38 +167,54 @@ Em resumo:
 
 - **C++** é a base mais sólida
 - **Python** é a extensão de alto nível para Linux
-- **MicroPython** é a adaptação leve e experimental para placas interpretadas
+- **MicroPython** é a adaptação leve para placas interpretadas, já validada em hardware real
 
-## 5. Plataformas atuais e direção futura
+## 5. Placas testadas e direção do projeto
 
-### 5.1 Plataforma principal neste momento
+### 5.1 Placas já testadas e validadas
 
-Atualmente, o caminho mais natural deste port é:
+Até o momento, este port já foi testado e validado em:
 
-- **ESP32 rodando MicroPython**
-
-Isso faz sentido por vários motivos:
-
-- bom suporte de comunidade
-- presença de `machine.UART`
-- processo relativamente simples de flash
-- facilidade de testes via USB
-- ótimo custo-benefício para laboratório, conteúdo e prototipagem
-
-### 5.2 Plataformas previstas para evolução futura
-
-Existe intenção de ampliar a portabilidade para:
-
+- **ESP32**
 - **Raspberry Pi Pico**
 - **Sipeed MaixBit**
 
-### 5.3 Observação importante
+Esse ponto é importante porque mostra que a biblioteca não ficou restrita a um único ambiente.
 
-Essa portabilidade futura exige cuidado porque:
+### 5.2 ESP32
 
-- Raspberry Pi Pico usa um ambiente diferente do ESP32 em vários detalhes práticos
-- o MaixBit pode envolver diferenças importantes dependendo do firmware e do dialeto utilizado
-- nem todo comportamento de `machine`, `UART`, ticks e temporização se transfere de forma idêntica entre plataformas
+O ESP32 continua sendo um dos caminhos mais naturais para este port porque oferece:
+
+- bom suporte de comunidade
+- presença de `machine.UART`
+- processo simples de gravação de firmware
+- deploy direto por USB
+- excelente custo-benefício para laboratório, testes e prototipagem
+
+### 5.3 Raspberry Pi Pico
+
+O Raspberry Pi Pico é especialmente relevante para o projeto porque:
+
+- é uma plataforma muito acessível
+- faz bastante sentido para conteúdo técnico e exemplos didáticos
+- já foi validado com sucesso com esta biblioteca
+
+No caso do Pico, o fluxo de upload da biblioteca com `ampy` também se encaixa bem na proposta atual.
+
+### 5.4 Sipeed MaixBit
+
+O MaixBit também já foi validado com sucesso, mas seu fluxo de uso merece atenção especial porque, no caso dessa placa, o caminho mais prático adotado no projeto é trabalhar com **microSD**.
+
+Isso muda a forma de deploy da biblioteca e também a forma de preparar o ambiente de import.
+
+### 5.5 Direção do projeto
+
+Mesmo com essas três placas já validadas, a direção do projeto continua aberta para:
+
+- refinamento da biblioteca em MicroPython
+- melhoria de organização interna
+- polimento dos exemplos por placa
+- expansão futura para outros hardwares compatíveis
 
 ## 6. Quando usar esta versão
 
@@ -201,7 +225,7 @@ Esta versão faz bastante sentido quando você quer:
 - validar uma topologia simples
 - criar conteúdo técnico ou exemplos didáticos
 - experimentar GPIO remoto ou payload transparente
-- usar ESP32 com um ciclo de iteração mais rápido
+- usar ESP32, Pico ou MaixBit com um ciclo de iteração mais rápido
 - fazer testes exploratórios em laboratório
 
 ## 7. Quando não usar esta versão
@@ -257,9 +281,9 @@ Essa separação é importante porque ajuda a manter:
 
 Antes de usar a biblioteca, vale entender alguns pontos que influenciam diretamente a experiência prática.
 
-### 9.1 Esta não é a versão mais madura do projeto
+### 9.1 Esta versão já foi validada, mas ainda pode evoluir bastante
 
-Se você já vem do C++ ou do Python, entre sabendo que a camada MicroPython ainda está amadurecendo.
+Se você já vem do C++ ou do Python, a leitura correta não é mais tratar esta camada como beta ou puramente experimental. O correto hoje é entendê-la como uma variação **já validada em hardware real**, mas que ainda pode crescer em refinamento porque MicroPython não é minha base principal de trabalho.
 
 ### 9.2 A UART precisa estar correta
 
@@ -281,13 +305,29 @@ MicroPython entrega muita agilidade, mas cobra preço em:
 - sensibilidade a memória
 - overhead de interpretação
 
-### 9.4 Nem tudo que está ótimo em ESP32 estará automaticamente pronto em Pico ou MaixBit
+### 9.4 A biblioteca `micropython/loramesh` precisa ser transferida por completo
 
-Essa é uma das razões pelas quais a portabilidade futura deve ser tratada com cautela.
+Em todos os hardwares validados neste projeto, a regra prática é a mesma: **a pasta `/micropython/loramesh` precisa ser transferida por completo para o microcontrolador em questão**.
+
+Isso vale para:
+
+- **ESP32**
+- **Raspberry Pi Pico**
+- **Sipeed MaixBit**
+
+O que muda entre eles não é a necessidade da biblioteca, mas o método de deploy.
+
+### 9.5 ESP32 e Raspberry Pi Pico seguem bem com `ampy`
+
+Nos casos de **ESP32** e **Raspberry Pi Pico**, o fluxo com `ampy` funciona bem para criação de diretórios, envio da biblioteca e atualização do `main.py`.
+
+### 9.6 MaixBit exige cuidado especial com microSD
+
+No **Sipeed MaixBit**, o caminho adotado é colocar a biblioteca em um **microSD** e ajustar o `sys.path` antes de importar os módulos do projeto. Sem isso, o import pode não localizar a biblioteca corretamente.
 
 ## 10. Preparando o ESP32 com MicroPython
 
-O fluxo prático informado para o projeto começa apagando a flash e gravando a imagem MicroPython no ESP32.
+O fluxo prático informado para o projeto começa apagando a flash e gravando a imagem MicroPython no ESP32. Esse continua sendo um dos caminhos mais práticos para colocar a placa em um estado limpo antes de subir a biblioteca.
 
 ### 10.1 Apagando a flash
 
@@ -335,8 +375,9 @@ O fluxo informado por você pressupõe algo como:
 
 1. entrar na pasta da variação MicroPython
 2. copiar um exemplo de `main.py` para a raiz de trabalho
-3. enviar a biblioteca `loramesh`
-4. enviar o `main.py`
+3. garantir que a biblioteca `loramesh` será transferida por completo
+4. enviar a biblioteca
+5. enviar o `main.py`
 
 ### 12.1 Entrando na pasta da variação MicroPython
 
@@ -352,12 +393,45 @@ cp exemples/you_board/main.py ./main.py
 
 Na prática, isso deixa o projeto preparado para subir o `main.py` principal junto com a biblioteca.
 
-### 12.3 Observação
+### 12.3 A biblioteca `loramesh` deve ir inteira para a placa
+
+Independentemente da placa usada, a ideia correta é transferir **toda a pasta `micropython/loramesh`** para o hardware de destino.
+
+Isso é importante porque o projeto depende da estrutura completa de módulos, e não apenas de um arquivo isolado.
+
+### 12.4 ESP32 e Pico
+
+No **ESP32** e no **Raspberry Pi Pico**, o fluxo com `ampy` é o caminho natural para:
+
+- criar diretórios
+- enviar a biblioteca inteira
+- subir o `main.py`
+- atualizar arquivos individualmente quando necessário
+
+### 12.5 MaixBit
+
+No **Sipeed MaixBit**, o processo muda: em vez de mandar a biblioteca com `ampy` para a flash interna da mesma forma que no ESP32 e no Pico, o caminho prático adotado é colocar a biblioteca em um **microSD**.
+
+Antes de importar a biblioteca no MaixBit, é importante preparar o ambiente assim:
+
+```python
+import sys
+import time
+import urandom
+
+if "/sd" not in sys.path:
+    sys.path.append("/sd")
+```
+
+Só depois disso faz sentido importar os módulos da biblioteca a partir do cartão.
+
+### 12.6 Observação
 
 A pasta de exemplos deve ser ajustada conforme a estrutura real usada no seu repositório. O importante aqui é a lógica:
 
 - escolher um exemplo da sua placa
 - promovê-lo temporariamente a `main.py`
+- transferir a biblioteca `loramesh` completa
 - subir esse arquivo junto com a biblioteca
 
 ## 13. Subindo a biblioteca para a placa com ampy
@@ -418,6 +492,15 @@ Esse fluxo permite:
 - enviar todos os módulos Python necessários
 - colocar um `main.py` pronto para execução
 - verificar se o conteúdo realmente foi gravado
+
+### 13.8 Em quais placas este fluxo com `ampy` funciona diretamente
+
+Esse fluxo com `ampy` se encaixa bem em:
+
+- **ESP32**
+- **Raspberry Pi Pico**
+
+No caso do **MaixBit**, a lógica de organização da biblioteca continua valendo, mas o deploy prático deve ser feito via **microSD**.
 
 ## 14. Atualizando apenas o `main.py`
 
@@ -498,6 +581,8 @@ Camada de transporte usada pelo core para enviar e receber bytes sem depender di
 Camada ligada ao tempo e temporização, importante para timeouts, polling e controle interno.
 
 Essa organização é valiosa porque ajuda a manter a versão MicroPython parecida com a forma de pensar do projeto maior.
+
+No caso do MaixBit, essa mesma estrutura precisa estar disponível no caminho acessível pelo sistema de arquivos do cartão, normalmente sob `/sd`, para que os imports funcionem corretamente após o ajuste do `sys.path`.
 
 ## 17. Constantes principais
 
@@ -975,7 +1060,27 @@ while True:
     time.sleep(1)
 ```
 
-### 26.6 Exemplo de envio transparente
+### 26.6 Exemplo mínimo de preparação para MaixBit via microSD
+
+No MaixBit, antes de importar a biblioteca, prepare o caminho do cartão:
+
+```python
+import sys
+import time
+import urandom
+
+if "/sd" not in sys.path:
+    sys.path.append("/sd")
+
+from loramesh.adapters.machine_uart import MachineUARTAdapter
+from loramesh.transport.UARTTransport import UARTTransport
+from loramesh.backend.MicroPythonTicks import MicroPythonTicks
+from loramesh.core.LoRaMESH import LoRaMESH
+```
+
+Esse trecho é importante porque, nesse cenário, a biblioteca foi colocada no microSD e precisa estar acessível pelo `sys.path`.
+
+### 26.7 Exemplo de envio transparente
 
 ```python
 mesh.sendTransparent(2, b"START_PUMP")
@@ -983,9 +1088,15 @@ mesh.sendTransparent(2, b"START_PUMP")
 
 ## 27. Boas práticas
 
-### 27.1 Trate esta versão como port experimental
+### 27.1 Comece pelo fluxo mais básico e validado
 
-Mesmo que funcione bem no seu teste, não assuma automaticamente maturidade de produção.
+Antes de expandir o projeto, valide primeiro:
+
+- leitura local
+- leitura de parâmetros
+- escrita digital em um slave
+- leitura digital
+- leitura analógica
 
 ### 27.2 Sempre valide com `localRead()`
 
@@ -999,17 +1110,15 @@ Isso é especialmente importante em MicroPython, onde o ambiente interpretado j�
 
 Principalmente quando o comando é importante.
 
-### 27.5 Prefira exemplos simples primeiro
+### 27.5 Transfira a biblioteca `loramesh` completa
 
-Antes de montar uma aplicação maior, valide:
+Evite subir só arquivos soltos sem a estrutura correta. O caminho mais seguro é sempre garantir que a pasta `loramesh` esteja completa no dispositivo ou no microSD.
 
-- leitura local
-- leitura de parâmetros
-- escrita digital em um slave
-- leitura digital
-- leitura analógica
+### 27.6 No MaixBit, ajuste o `sys.path` antes dos imports
 
-### 27.6 Documente o que funcionou no seu hardware
+Sem isso, a biblioteca pode não ser localizada corretamente quando estiver no cartão.
+
+### 27.7 Documente o que funcionou no seu hardware
 
 Anote sempre:
 
@@ -1020,16 +1129,18 @@ Anote sempre:
 - baudrate
 - configuração de rádio
 - IDs da rede
+- forma de deploy usada
 
 ## 28. Limitações atuais
 
 Hoje, é prudente assumir que esta variação pode apresentar limitações como:
 
-- cobertura incompleta em relação ao ecossistema principal
-- diferenças de comportamento entre placas
-- necessidade de ajustes manuais no deploy
-- pouca validação em cenários extensos
-- maturidade inferior à base em C++
+- diferenças de comportamento entre placas e firmwares
+- necessidade de ajustes manuais no deploy conforme o hardware
+- menor nível de otimização em comparação com uma implementação nativa em C++
+- evolução contínua de organização interna e ergonomia da API
+
+Isso não invalida a biblioteca. Apenas posiciona corretamente o tipo de maturidade esperado de uma camada em MicroPython dentro de um ecossistema cujo núcleo principal continua sendo o C++.
 
 ## 29. Erros comuns e diagnóstico
 
@@ -1064,32 +1175,52 @@ Verifique:
 - ID do slave
 - tempo entre tentativas
 
-### 29.4 O código funciona no ESP32, mas não no futuro target
+### 29.4 O código funciona em uma placa, mas não em outra
 
-Esse tipo de diferença é esperado. Pico e MaixBit não devem ser tratados como substituição automática sem validação específica.
+Mesmo já tendo validação em ESP32, Raspberry Pi Pico e MaixBit, ainda vale lembrar que diferenças de firmware, pinos, UART e método de deploy podem gerar comportamentos específicos por placa.
 
-## 30. Portabilidade futura para Raspberry Pi Pico e MaixBit
+Verifique especialmente:
 
-Existe interesse real em levar esta variação para:
+- mapeamento de UART
+- método de transferência da biblioteca
+- uso de flash interna ou microSD
+- necessidade de ajuste de `sys.path`
+- firmware MicroPython ou ambiente compatível usado na placa
 
+## 30. Placas testadas e expansão futura
+
+Atualmente, esta variação já foi testada e validada em:
+
+- **ESP32**
 - **Raspberry Pi Pico**
 - **Sipeed MaixBit**
 
-Essa evolução faz sentido porque dialoga com dois mundos que já fazem parte do laboratório:
+Esse ponto é importante porque mostra que o port já atravessou ambientes bem diferentes entre si.
 
-- o Pico como plataforma acessível, popular e muito interessante para conteúdo técnico
-- o MaixBit como plataforma que já entrou em experimentação prática
+### 30.1 ESP32
 
-Ainda assim, é importante deixar claro:
+No ESP32, o fluxo com `esptool.py` e `ampy` se encaixa muito bem e torna a iteração rápida.
 
-- isso é uma direção futura
-- a compatibilidade não deve ser assumida sem testes
-- pode haver ajustes específicos por plataforma
-- parte da arquitetura talvez precise ser refinada para suportar bem esses ambientes
+### 30.2 Raspberry Pi Pico
+
+No Raspberry Pi Pico, a biblioteca também se mostrou funcional, reforçando que o projeto não está preso ao ESP32.
+
+### 30.3 Sipeed MaixBit
+
+No MaixBit, a validação também foi bem-sucedida, com a diferença prática de que o caminho adotado passa pelo uso de **microSD** e pelo ajuste do `sys.path` para localizar a biblioteca.
+
+### 30.4 Expansão futura
+
+A partir dessa base, o projeto pode continuar evoluindo para:
+
+- refinamento dos exemplos por hardware
+- melhoria de organização da biblioteca
+- polimento de deploy
+- expansão para outras placas compatíveis com MicroPython
 
 ## 31. Casos de uso reais
 
-Mesmo experimental, esta variação já conversa muito bem com cenários como:
+Com a validação já feita em hardwares diferentes, esta variação conversa muito bem com cenários como:
 
 - testes rápidos de rede LoRaMESH
 - validação de provisionamento
@@ -1098,7 +1229,9 @@ Mesmo experimental, esta variação já conversa muito bem com cenários como:
 - acionamento de saídas em laboratório
 - criação de conteúdo técnico
 - experimentação em ESP32
-- futuras provas de conceito com Pico e MaixBit
+- aplicações leves em Raspberry Pi Pico
+- integrações específicas com MaixBit
+- futuras provas de conceito em outros hardwares compatíveis
 
 ## 32. Licença
 
@@ -1124,10 +1257,12 @@ Empresa: Radioenge
 
 ## 34. Considerações finais
 
-O **LoRaMESH MicroPython** é uma extensão experimental e honesta do ecossistema LoRaMESH.
+O **LoRaMESH MicroPython** não deve mais ser visto como um simples port beta ou apenas uma prova de conceito.
 
-Ele não tenta competir com a base em C++ em maturidade. O objetivo aqui é outro: abrir espaço para testes mais rápidos, protótipos leves, conteúdo técnico, experimentação e futuras possibilidades em placas acessíveis.
+A mudança de `1.0.0.b1` para **`1.0.0`** acontece porque a biblioteca já foi testada e validada em **ESP32**, **Raspberry Pi Pico** e **Sipeed MaixBit**, mostrando que a proposta funciona de verdade em hardwares diferentes.
 
-Ao mesmo tempo, ele preserva algo muito importante: a identidade do projeto. Mesmo em MicroPython, a ideia continua sendo trabalhar com LoRaMESH de forma real, indo além do envio superficial de bytes e buscando configuração, controle remoto de IO, leitura analógica e integração prática com hardware.
+Ao mesmo tempo, eu faço questão de manter uma leitura honesta sobre o projeto: **MicroPython não é a base da maior parte do meu trabalho com microcontroladores**. Isso significa que ainda existe bastante espaço para evoluir em refinamento interno, ergonomia e otimização, mesmo com o port já validado.
 
-Se a sua intenção é explorar o ecossistema LoRaMESH em um ambiente mais leve e mais rápido de iterar, esta variação já entrega um caminho promissor. Só vale manter a expectativa correta: **trate esta camada como um port em evolução, útil para laboratório, testes e prototipagem, mas ainda amadurecendo em robustez e refinamento**.
+Ainda assim, a identidade do projeto permanece muito clara. Mesmo em MicroPython, a ideia continua sendo trabalhar com LoRaMESH de forma real, indo além do envio superficial de bytes e buscando configuração de rede, controle remoto de IO, leitura analógica e integração prática com hardware.
+
+Se a intenção é explorar o ecossistema LoRaMESH em um ambiente mais leve e mais rápido de iterar, esta variação já entrega uma base concreta, funcional e validada. E como o port já mostrou resultado em placas bem diferentes entre si, ele também passa a abrir um caminho mais sólido para evolução futura dentro do ecossistema.

@@ -1,0 +1,242 @@
+#include "loramesh.h"
+#include "main.h"
+#define STM32
+#include "core/LoRaMESH.h"
+#include "adapters/stm32_hal/Stm32HalUartTransport.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+extern "C" {
+    extern UART_HandleTypeDef huart1;
+    extern UART_HandleTypeDef huart2;
+}
+
+static constexpr uint16_t MAX_REPLICATE_IN_SLAVES = 3;
+static constexpr uint32_t DELAY_BETWEEN_SLAVES    = 250;
+static constexpr uint8_t  MAX_RETRY               = 3;
+
+static uint8_t ID = 0;
+
+struct UartRingBuffer
+{
+    volatile uint16_t head;
+    volatile uint16_t tail;
+    uint8_t data[256];
+};
+
+static UartRingBuffer g_loraRxRb = {};
+static uint8_t g_loraRxByte = 0;
+
+static void rbPush(UartRingBuffer* rb, uint8_t value)
+{
+    uint16_t next = (rb->head + 1u) % sizeof(rb->data);
+    if (next == rb->tail)
+        return;
+
+    rb->data[rb->head] = value;
+    rb->head = next;
+}
+
+static size_t rbAvailable(void* ctx)
+{
+    UartRingBuffer* rb = static_cast<UartRingBuffer*>(ctx);
+
+    if (rb->head >= rb->tail)
+        return rb->head - rb->tail;
+
+    return sizeof(rb->data) - rb->tail + rb->head;
+}
+
+static size_t rbRead(void* ctx, uint8_t* out, size_t maxLen)
+{
+    UartRingBuffer* rb = static_cast<UartRingBuffer*>(ctx);
+    size_t count = 0;
+
+    while ((count < maxLen) && (rb->tail != rb->head))
+    {
+        out[count++] = rb->data[rb->tail];
+        rb->tail = (rb->tail + 1u) % sizeof(rb->data);
+    }
+
+    return count;
+}
+
+static void uartPrint(UART_HandleTypeDef* huart, const char* msg)
+{
+    HAL_UART_Transmit(
+        huart,
+        reinterpret_cast<uint8_t*>(const_cast<char*>(msg)),
+        static_cast<uint16_t>(strlen(msg)),
+        1000
+    );
+}
+
+static void uartPrintLn(UART_HandleTypeDef* huart, const char* msg)
+{
+    uartPrint(huart, msg);
+    uartPrint(huart, "\r\n");
+}
+
+static void debugPrint(const char* msg)
+{
+    uartPrintLn(&huart2, msg);
+}
+
+static void startLoraReception(void)
+{
+    HAL_UART_Receive_IT(&huart1, &g_loraRxByte, 1);
+}
+
+static uint32_t randomBackoffMs(void)
+{
+    return 1500u + (rand() % 2000);
+}
+
+static Stm32HalUartTransport transportCmd(&huart1, &g_loraRxRb, rbAvailable, rbRead);
+static LoRaMESH lora(&transportCmd, &transportCmd);
+
+static void initializeRadio(void)
+{
+    uartPrintLn(&huart2, "Aguardando modulo...");
+
+    while (!lora.localRead())
+    {
+        uartPrintLn(&huart2, "Modulo nao respondeu ainda...");
+        HAL_Delay(500);
+    }
+
+    uartPrintLn(&huart2, "Modulo pronto");
+
+    if (lora.localId != ID)
+    {
+        uartPrintLn(&huart2, "Configurando NetworkID");
+
+        for (int i = 0; i < 3; ++i)
+        {
+            if (lora.setNetworkID(ID))
+                break;
+            HAL_Delay(200);
+        }
+    }
+
+    for (int i = 0; i < 3; ++i)
+        if (lora.getBPS())
+            break;
+
+    if (lora.BW != BW500 || lora.SF != SF7 || lora.CR != CR4_5)
+    {
+        uartPrintLn(&huart2, "Configurando BPS");
+
+        for (int i = 0; i < 3; ++i)
+            if (lora.setBPS(BW500, SF7, CR4_5))
+                break;
+    }
+
+    for (int i = 0; i < 3; ++i)
+        if (lora.getClass())
+            break;
+
+    if (lora.LoRa_class != CLASS_C || lora.LoRa_window != WINDOW_5s)
+    {
+        uartPrintLn(&huart2, "Configurando classe");
+
+        for (int i = 0; i < 3; ++i)
+            if (lora.setClass(CLASS_C, WINDOW_5s))
+                break;
+    }
+
+    if (lora.registered_password != 123)
+    {
+        uartPrintLn(&huart2, "Configurando senha");
+
+        for (int i = 0; i < 3; ++i)
+            if (lora.setPassword(123))
+                break;
+    }
+
+    uartPrintLn(&huart2, "Configuracao concluida");
+}
+
+extern "C" void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart)
+{
+    if (huart->Instance == USART1)
+    {
+        rbPush(&g_loraRxRb, g_loraRxByte);
+        HAL_UART_Receive_IT(&huart1, &g_loraRxByte, 1);
+    }
+}
+
+extern "C" void HAL_UART_ErrorCallback(UART_HandleTypeDef* huart)
+{
+    if (huart->Instance == USART1)
+    {
+        HAL_UART_Receive_IT(&huart1, &g_loraRxByte, 1);
+    }
+}
+
+extern "C" void loramesh_init(void)
+{
+    srand(HAL_GetTick());
+
+    uartPrintLn(&huart2, "Inicializando LoRaMesh...");
+    startLoraReception();
+
+    lora.setDebug(debugPrint, true);
+    lora.begin(true);
+
+    initializeRadio();
+
+    uartPrintLn(&huart2, "Master pronto");
+}
+
+extern "C" void loramesh_loop(void)
+{
+    static bool state = false;
+    static uint32_t lastTick = 0;
+    char msg[64];
+
+    if ((HAL_GetTick() - lastTick) < DELAY_BETWEEN_SLAVES)
+        return;
+
+    lastTick = HAL_GetTick();
+    state = !state;
+
+    if (state)
+    {
+        for (uint16_t i = 1; i <= MAX_REPLICATE_IN_SLAVES; ++i)
+        {
+            for (uint8_t j = 0; j < MAX_RETRY; ++j)
+            {
+                if (lora.digitalWrite(i, 0, 1))
+                    break;
+                HAL_Delay(randomBackoffMs());
+            }
+
+            snprintf(msg, sizeof(msg), "GPIO0 SLAVE:%u=ON", i);
+            uartPrintLn(&huart2, msg);
+
+            if (MAX_REPLICATE_IN_SLAVES > 1)
+                HAL_Delay(DELAY_BETWEEN_SLAVES);
+        }
+    }
+    else
+    {
+        for (uint16_t i = 1; i <= MAX_REPLICATE_IN_SLAVES; ++i)
+        {
+            for (uint8_t j = 0; j < MAX_RETRY; ++j)
+            {
+                if (lora.digitalWrite(i, 0, 0))
+                    break;
+                HAL_Delay(randomBackoffMs());
+            }
+
+            snprintf(msg, sizeof(msg), "GPIO0 SLAVE:%u=OFF", i);
+            uartPrintLn(&huart2, msg);
+
+            if (MAX_REPLICATE_IN_SLAVES > 1)
+                HAL_Delay(DELAY_BETWEEN_SLAVES);
+        }
+    }
+}

@@ -1,0 +1,7 @@
+22:21:37 **** Build of configuration Debug for project stm32l412kb_loramesh ****
+make -j16 all 
+arm-none-eabi-size  stm32l412kb_loramesh.elf 
+   text	   data	    bss	    dec	    hex	filename
+  26904	    108	   3004	  30016	   7540	stm32l412kb_loramesh.elf
+Finished building: default.size.stdout
+ 

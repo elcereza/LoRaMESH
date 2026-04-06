@@ -6,6 +6,7 @@ Este projeto não foi pensado apenas para um único firmware ou para um único s
 
 1. **microcontroladores e firmwares embarcados**
 2. **Linux, Raspberry Pi, gateways e aplicações de alto nível**
+3. **ports em [MicroPython](https://github.com/elcereza/LoRaMESH/tree/master/micropython) para prototipagem, integração e uso embarcado**
 
 Por isso, a biblioteca foi estruturada em torno de um núcleo C++ com uma abstração de transporte chamada `ILoraTransport`, permitindo reaproveitar a mesma lógica de protocolo em diferentes plataformas sem reescrever o comportamento principal do módulo a cada novo port.
 
@@ -16,6 +17,8 @@ pip install loramesh
 ```
 
 replica a lógica desta biblioteca em uma interface mais amigável para scripts, automações, gateways Linux e Raspberry Pi. Em outras palavras, o **C++ é a base** e o **Python é a extensão de alto nível** construída em cima dessa base.
+
+O mesmo ecossistema também já conta com uma frente em [MicroPython](https://github.com/elcereza/LoRaMESH/tree/master/micropython), pensada para ampliar o alcance da biblioteca em ambientes embarcados mais leves sem quebrar a coerência conceitual do projeto. Assim, este repositório em C++ continua sendo o centro técnico da lógica, enquanto Python e MicroPython funcionam como derivações práticas desse mesmo núcleo.
 
 ## Sumário
 
@@ -69,7 +72,7 @@ O **LoRaMESH C++** é o núcleo responsável por concentrar a lógica real de co
 - controlam GPIO remoto
 - leem entradas digitais e analógicas remotas
 - calculam resistência e temperatura a partir do ADC
-- mantêm um fluxo único reaproveitável entre Arduino, Linux, Raspberry Pi e futuras integrações com ESP-IDF e STM32 HAL
+- mantêm um fluxo único reaproveitável entre Arduino, Linux, Raspberry Pi, ESP-IDF, STM32 HAL e derivações como Python e MicroPython
 
 A proposta desta biblioteca não é só encapsular um conjunto de comandos. Ela existe para ser o coração de um ecossistema maior, em que:
 
@@ -155,11 +158,11 @@ No caso do Raspberry Pi, existem duas abordagens naturais:
 
 ### 5.3 ESP-IDF
 
-ESP-IDF já faz parte da direção do projeto e deve existir como integração própria. No momento, essa frente pode ficar em **standby**, mas o README já precisa reservar espaço para ela porque a arquitetura foi desenhada exatamente para isso.
+ESP-IDF já foi testado e validado dentro da proposta da biblioteca. Isso é importante porque mostra que a arquitetura realmente funciona fora do universo Arduino e Linux, mantendo a mesma lógica central do core C++ em um framework nativo do ESP32.
 
 ### 5.4 STM32 HAL
 
-STM32 HAL também faz parte da direção natural da biblioteca. Assim como no caso de ESP-IDF, esta parte pode permanecer em **standby por enquanto**, mas precisa estar contemplada na documentação porque o core já foi pensado para ser portável.
+STM32 HAL também já foi testado e validado, mas aqui existe uma observação importante: a integração pede alguns ajustes manuais no projeto para que o uso fique correto. Ou seja, não é uma ideia apenas teórica ou futura; ela já funciona, porém depende de preparação adequada do ambiente STM32 para compilar e integrar o core C++ da biblioteca.
 
 ### 5.5 Um ponto importante sobre os exemplos
 
@@ -390,11 +393,13 @@ As duas abordagens fazem sentido. A escolha depende mais do tipo de aplicação 
 
 ### 10.4 ESP-IDF
 
-A arquitetura já reserva espaço para um adapter dedicado para ESP-IDF. Mesmo estando em standby por enquanto, ele faz parte da direção técnica do projeto.
+A arquitetura já contempla um adapter dedicado para ESP-IDF, e essa integração já foi testada e validada. Isso reforça que o desenho baseado em `ILoraTransport` realmente cumpre o papel de tornar o core portátil entre diferentes ambientes.
 
 ### 10.5 STM32 HAL
 
-STM32 HAL também já está contemplado na arquitetura. A ideia aqui é seguir a mesma linha: um adapter fino sobre a UART/HAL, reaproveitando integralmente o core C++.
+STM32 HAL também já está contemplado na arquitetura e essa integração já foi testada e validada. A ideia aqui continua sendo a mesma: usar um adapter fino sobre a UART/HAL, reaproveitando integralmente o core C++.
+
+Ao mesmo tempo, é importante deixar claro que o uso em STM32 costuma exigir alguns ajustes manuais no projeto, principalmente quando ele nasce a partir de um ambiente gerado pelo CubeIDE ou por templates que ainda não estão preparados para compilar a biblioteca como C++. Esses ajustes são detalhados mais à frente neste README.
 
 ## 11. Inicialização rápida
 
@@ -1694,7 +1699,9 @@ if __name__ == "__main__":
 
 ### 25.11 Exemplo reservado para ESP-IDF
 
-Esta seção fica reservada para a integração futura com ESP-IDF. Quando essa frente estiver consolidada, o ideal é documentar aqui:
+A integração com ESP-IDF já foi testada e validada, então esta seção não existe por ausência de suporte, e sim para reservar um espaço próprio para um exemplo dedicado e mais polido dentro do README.
+
+O ideal é que este bloco cresça para documentar de forma separada:
 
 - inicialização da UART no ESP-IDF
 - criação do adapter da plataforma
@@ -1704,13 +1711,16 @@ Esta seção fica reservada para a integração futura com ESP-IDF. Quando essa 
 
 ### 25.12 Exemplo reservado para STM32 HAL
 
-Esta seção fica reservada para a integração futura com STM32 HAL. Quando essa parte estiver consolidada, o ideal é documentar aqui:
+A integração com STM32 HAL já foi testada e validada, mas merece um bloco próprio porque, diferentemente de Arduino ou Linux, ela normalmente exige alguns ajustes manuais no projeto antes de funcionar de forma limpa.
+
+O ideal é que esta seção evolua para documentar um exemplo dedicado cobrindo:
 
 - inicialização da UART via HAL
 - adapter sobre `UART_HandleTypeDef`
 - integração de `millis()` ou time base equivalente
 - callback de debug
 - exemplos equivalentes aos de Arduino
+- ajustes de build e include paths necessários para o projeto STM32
 
 ## 26. Boas práticas
 
@@ -1800,29 +1810,65 @@ Verifique:
 
 ## 28. ESP-IDF e STM32 HAL
 
-Estas duas plataformas já fazem parte da direção do projeto e não devem ficar invisíveis no README, mesmo estando em standby por enquanto.
+Essas duas plataformas não estão aqui apenas como intenção futura. O código já foi testado e validado tanto em ESP-IDF quanto em STM32 HAL. O que muda entre elas não é a viabilidade do core, e sim o nível de preparação manual exigido pelo projeto hospedeiro.
 
 ### 28.1 ESP-IDF
 
-A integração esperada com ESP-IDF deve seguir a mesma filosofia do restante do projeto:
+O código já foi testado e validado para ESP-IDF. Isso confirma que a proposta multiplataforma da biblioteca funciona também no framework nativo do ESP32, sem depender exclusivamente do ecossistema Arduino.
+
+A integração segue a mesma filosofia do restante do projeto:
 
 - adapter fino sobre UART do framework
 - implementação de `write()`, `available()`, `read()` e `millis()`
 - reaproveitamento integral do core `LoRaMESH`
 - exemplos equivalentes aos de Arduino
 
+Mesmo quando a documentação dedicada de ESP-IDF ainda não estiver tão extensa quanto a de Arduino, o ponto importante é que esta frente já foi colocada em prática e validada.
+
 ### 28.2 STM32 HAL
 
-Para STM32 HAL, a ideia é exatamente a mesma:
+O código também já foi testado e validado para STM32 HAL. Porém, aqui existe uma observação prática importante: para colocar a biblioteca para rodar no STM32, normalmente é necessário preparar o projeto para receber corretamente um core em C++.
+
+A lógica continua sendo a mesma:
 
 - adapter fino sobre HAL UART
 - time base compatível para `millis()`
 - reaproveitamento do core sem reinventar o protocolo
 - exemplos equivalentes aos de Arduino
 
-### 28.3 Por que reservar essas seções desde já
+Mas, além disso, em STM32 costuma ser necessário:
 
-Porque o projeto já foi desenhado com essa ambição multiplataforma. Deixar isso explícito no README ajuda a manter o direcionamento do repositório coeso mesmo antes da finalização dessas integrações.
+- habilitar a compilação do projeto para C++ também
+- criar arquivos auxiliares como `loramesh.h` e `loramesh.cpp` para organizar o uso da biblioteca dentro do projeto gerado
+- adicionar a biblioteca ao projeto STM32
+- remover a exclusão da biblioteca no build, caso ela tenha ficado marcada como excluída
+
+Também é necessário adicionar estas paths de include no projeto:
+
+```text
+${workspace_loc:/${ProjName}/LoRaMESH/src}
+${workspace_loc:/${ProjName}/LoRaMESH/src/core}
+${workspace_loc:/${ProjName}/LoRaMESH/src/adapters/stm32_hal}
+```
+
+Outro ajuste importante fica em `adapters/stm32_hal/Stm32HalUartTransport.h`. No estado atual, a linha de include da HAL está apontando para:
+
+```cpp
+#include "stm32l4xx_hal.h"
+```
+
+Esse include deve ser alterado conforme a família real do seu microcontrolador. Em outras palavras, se o seu projeto usa outra família STM32, você precisa trocar esse include para a HAL correspondente.
+
+### 28.3 Por que manter essas seções explícitas no README
+
+Porque o projeto já passou da fase em que ESP-IDF e STM32 HAL eram apenas intenção. Ambas as frentes já foram testadas e validadas, então o README precisa refletir isso.
+
+Ao mesmo tempo, vale manter estas seções destacadas porque elas não têm exatamente o mesmo nível de fricção na integração:
+
+- em ESP-IDF, a validação do core mostra que a arquitetura funciona bem nesse ambiente
+- em STM32 HAL, além da validação, existe uma preparação manual importante do projeto
+
+Deixar isso explícito no README ajuda a manter o direcionamento do repositório honesto, técnico e coerente com a realidade de uso.
 
 ## 29. Casos de uso reais
 

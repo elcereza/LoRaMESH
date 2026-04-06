@@ -1,13 +1,7 @@
-examples/ESPIDF/
-examples/STM32/
-
 python/dist/
 python/src/loramesh.egg-info/
 python/venv/
 python/build/
-
-src/adapters/stm32_hal/
-src/adapters/espidf/
 
 micropython/workspace/
 micropython/examples/rp2
@@ -18,5 +12,8 @@ micropython/loramesh/backend/__pycache__
 micropython/loramesh/boards/__pycache__
 micropython/loramesh/core/__pycache__
 micropython/loramesh/transport/__pycache__
+micropython/app.py
+micropython/main.py
+micropython/upload.sh
 
 package.json

@@ -1,0 +1,29 @@
+../LoRaMESH/src/core/LoRaMESH.cpp:3:1:LoRaMESH::LoRaMESH(ILoraTransport*, ILoraTransport*)	24	static
+../LoRaMESH/src/core/LoRaMESH.cpp:33:6:void LoRaMESH::setDebug(DebugFn, bool)	24	static
+../LoRaMESH/src/core/LoRaMESH.cpp:39:6:void LoRaMESH::dbgPrint(const char*)	16	static
+../LoRaMESH/src/core/LoRaMESH.cpp:44:6:void LoRaMESH::dbgHexDump(const char*, const uint8_t*, size_t)	168	static
+../LoRaMESH/src/core/LoRaMESH.cpp:75:6:static void LoRaMESH::u16_to_le(uint16_t, uint8_t*)	16	static
+../LoRaMESH/src/core/LoRaMESH.cpp:81:10:static uint16_t LoRaMESH::le_to_u16(const uint8_t*)	16	static
+../LoRaMESH/src/core/LoRaMESH.cpp:86:6:void LoRaMESH::begin(bool)	16	static
+../LoRaMESH/src/core/LoRaMESH.cpp:93:10:uint16_t LoRaMESH::ComputeCRC(const uint8_t*, uint16_t)	32	static
+../LoRaMESH/src/core/LoRaMESH.cpp:111:6:bool LoRaMESH::prepareFrameCommand(uint16_t, uint8_t, const uint8_t*, uint8_t)	32	static
+../LoRaMESH/src/core/LoRaMESH.cpp:138:6:bool LoRaMESH::PrepareFrameTransp(uint16_t, const uint8_t*, uint8_t)	32	static
+../LoRaMESH/src/core/LoRaMESH.cpp:159:6:bool LoRaMESH::sendPacket()	16	static
+../LoRaMESH/src/core/LoRaMESH.cpp:175:6:bool LoRaMESH::recvRaw(ILoraTransport*, uint8_t*, size_t*, size_t, uint32_t, uint32_t)	56	static
+../LoRaMESH/src/core/LoRaMESH.cpp:214:6:bool LoRaMESH::receivePacketCommand(uint16_t*, uint8_t*, uint8_t*, uint8_t*, uint32_t, uint32_t)	56	static
+../LoRaMESH/src/core/LoRaMESH.cpp:243:6:bool LoRaMESH::receivePacketTransp(uint16_t*, uint8_t*, uint8_t*, uint32_t, uint32_t)	48	static
+../LoRaMESH/src/core/LoRaMESH.cpp:278:6:bool LoRaMESH::localRead()	48	static
+../LoRaMESH/src/core/LoRaMESH.cpp:304:6:bool LoRaMESH::setNetworkID(uint16_t)	48	static
+../LoRaMESH/src/core/LoRaMESH.cpp:332:6:bool LoRaMESH::setPassword(uint32_t)	48	static
+../LoRaMESH/src/core/LoRaMESH.cpp:355:6:bool LoRaMESH::getBPS(bool)	48	static
+../LoRaMESH/src/core/LoRaMESH.cpp:381:6:bool LoRaMESH::getClass(bool)	48	static
+../LoRaMESH/src/core/LoRaMESH.cpp:407:6:bool LoRaMESH::setBPS(uint8_t, uint8_t, uint8_t)	32	static
+../LoRaMESH/src/core/LoRaMESH.cpp:432:6:bool LoRaMESH::setClass(uint8_t, uint8_t)	32	static
+../LoRaMESH/src/core/LoRaMESH.cpp:451:6:bool LoRaMESH::pinMode(uint16_t, uint8_t, uint8_t, uint8_t)	48	static
+../LoRaMESH/src/core/LoRaMESH.cpp:510:6:void LoRaMESH::getGPIOStatus(int16_t, uint8_t)	32	static
+../LoRaMESH/src/core/LoRaMESH.cpp:522:10:uint16_t LoRaMESH::analogRead(int16_t, uint8_t)	48	static
+../LoRaMESH/src/core/LoRaMESH.cpp:540:9:uint8_t LoRaMESH::digitalRead(int16_t, uint8_t)	48	static
+../LoRaMESH/src/core/LoRaMESH.cpp:559:6:bool LoRaMESH::digitalWrite(int16_t, uint8_t, uint8_t)	48	static
+../LoRaMESH/src/core/LoRaMESH.cpp:589:5:int LoRaMESH::getNoise(uint16_t, uint8_t)	40	static
+../LoRaMESH/src/core/LoRaMESH.cpp:614:5:int LoRaMESH::getR1(uint16_t, int)	56	static
+../LoRaMESH/src/core/LoRaMESH.cpp:621:8:double LoRaMESH::getTemp(uint16_t, int, int, int)	64	static
