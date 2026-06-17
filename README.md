@@ -1,6 +1,6 @@
 # LoRaMESH C++
 
-Biblioteca C++ para comunicação com módulos **LoRaMESH (Radioenge)** via UART, projetada para ser o **core nativo do ecossistema LoRaMESH** em múltiplas plataformas.
+Biblioteca para módulos **LoRaMESH da Radioenge** via UART, com suporte a **C++, Python, MicroPython, ESP32, STM32, Arduino, Raspberry Pi e Linux**.
 
 Este projeto não foi pensado apenas para um único firmware ou para um único sistema operacional. A proposta é ter uma base técnica sólida, reutilizável e previsível, capaz de atender dois mundos ao mesmo tempo:
 
